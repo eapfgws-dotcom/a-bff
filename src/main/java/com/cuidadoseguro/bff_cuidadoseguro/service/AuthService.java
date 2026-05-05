@@ -22,7 +22,7 @@ public class AuthService {
     }
 
     public String login(LoginRequest request) {
-        System.out.println("AAA: "+gatewayUrl + "/auth/login");
+        //System.out.println("AAA: "+gatewayUrl + "/auth/login");
         return restTemplate.postForObject(
                 gatewayUrl + "/auth/login",
                 request,
