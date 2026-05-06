@@ -24,18 +24,17 @@ public class PacienteController {
 
     private final PacienteService pacienteService;
 
-    @Operation(summary = "Listar pacientes")
     @GetMapping
-    public ResponseEntity<List<PacienteDto>> listar(
-            @RequestHeader("Authorization") String token
-    ) {
-        return ResponseEntity.ok(pacienteService.listar(token));
+    @Operation(summary = "Listar pacientes")
+    public ResponseEntity<?> listar(@RequestHeader("Authorization") String token) {
+        System.out.println("BFF RECIBE: " + token);
+        return pacienteService.listar(token);
     }
 
     @Operation(summary = "Obtener paciente por ID")
     @GetMapping("/{id}")
     public ResponseEntity<PacienteDto> obtener(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(pacienteService.obtener(token, id));
@@ -44,7 +43,7 @@ public class PacienteController {
     @Operation(summary = "Crear paciente")
     @PostMapping
     public ResponseEntity<PacienteDto> crear(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody PacienteDto paciente
     ) {
         return ResponseEntity.ok(pacienteService.crear(token, paciente));
@@ -53,7 +52,7 @@ public class PacienteController {
     @Operation(summary = "Actualizar paciente")
     @PutMapping("/{id}")
     public ResponseEntity<PacienteDto> actualizar(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable Long id,
             @RequestBody PacienteDto paciente
     ) {
@@ -63,7 +62,7 @@ public class PacienteController {
     @Operation(summary = "Eliminar paciente")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminar(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable Long id
     ) {
         pacienteService.eliminar(token, id);
