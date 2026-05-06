@@ -1,40 +1,93 @@
 package com.cuidadoseguro.bff_cuidadoseguro.service;
 
-// Permite inyectar valores desde application.properties
+import com.cuidadoseguro.bff_cuidadoseguro.dto.PacienteDto;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
-
-// Marca esta clase como un servicio de Spring Boot
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-
-// Permite realizar peticiones HTTP a otras APIs
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class PacienteService {
 
-    // Objeto que permitirá consumir el API Gateway
     private final RestTemplate restTemplate;
 
-    // Obtiene automáticamente la URL configurada
-    // en application.properties
     @Value("${gateway.url}")
     private String gatewayUrl;
 
-    // Constructor para inyectar RestTemplate
-    public PacienteService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    private HttpHeaders buildHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
     }
 
-    // Método que obtiene la lista de pacientes
-    // desde el API Gateway
-    public String obtenerPacientes() {
+    public List<PacienteDto> listar(String token) {
+        HttpEntity<Void> entity = new HttpEntity<>(buildHeaders(token));
 
-        // Construye la URL completa hacia el endpoint
-        // del API Gateway
-        String url = gatewayUrl + "/pacientes";
+        ResponseEntity<PacienteDto[]> response = restTemplate.exchange(
+                gatewayUrl + "/pacientes",
+                HttpMethod.GET,
+                entity,
+                PacienteDto[].class
+        );
 
-        // Realiza una petición GET al Gateway
-        // y devuelve la respuesta como texto JSON
-        return restTemplate.getForObject(url, String.class);
+        return Arrays.asList(response.getBody());
+    }
+
+    public PacienteDto obtener(String token, Long id) {
+        HttpEntity<Void> entity = new HttpEntity<>(buildHeaders(token));
+
+        ResponseEntity<PacienteDto> response = restTemplate.exchange(
+                gatewayUrl + "/pacientes/" + id,
+                HttpMethod.GET,
+                entity,
+                PacienteDto.class
+        );
+
+        return response.getBody();
+    }
+
+    public PacienteDto crear(String token, PacienteDto paciente) {
+        HttpEntity<PacienteDto> entity = new HttpEntity<>(paciente, buildHeaders(token));
+
+        ResponseEntity<PacienteDto> response = restTemplate.exchange(
+                gatewayUrl + "/pacientes",
+                HttpMethod.POST,
+                entity,
+                PacienteDto.class
+        );
+
+        return response.getBody();
+    }
+
+    public PacienteDto actualizar(String token, Long id, PacienteDto paciente) {
+        HttpEntity<PacienteDto> entity = new HttpEntity<>(paciente, buildHeaders(token));
+
+        ResponseEntity<PacienteDto> response = restTemplate.exchange(
+                gatewayUrl + "/pacientes/" + id,
+                HttpMethod.PUT,
+                entity,
+                PacienteDto.class
+        );
+
+        return response.getBody();
+    }
+
+    public void eliminar(String token, Long id) {
+        HttpEntity<Void> entity = new HttpEntity<>(buildHeaders(token));
+
+        restTemplate.exchange(
+                gatewayUrl + "/pacientes/" + id,
+                HttpMethod.DELETE,
+                entity,
+                Void.class
+        );
     }
 }
