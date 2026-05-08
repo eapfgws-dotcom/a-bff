@@ -27,7 +27,7 @@ public class PacienteController {
     @GetMapping
     @Operation(summary = "Listar pacientes")
     public ResponseEntity<?> listar(@RequestHeader("Authorization") String token) {
-        System.out.println("BFF RECIBE: " + token);
+        //System.out.println("BFF RECIBE: " + token);
         return pacienteService.listar(token);
     }
 
